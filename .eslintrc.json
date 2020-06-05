@@ -1,0 +1,51 @@
+{
+  "env": {
+    "browser": true,
+    "commonjs": true,
+    "es6": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "standard"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 11
+  },
+  "plugins": [
+    "@typescript-eslint"
+  ],
+  "root": true,
+  "rules": {
+    "linebreak-style": [
+      "error",
+      "unix"
+    ],
+    "no-alert": "error",
+    "no-console": "warn",
+    "one-var-declaration-per-line": [
+      "error",
+      "initializations"
+    ],
+    "quotes": [
+      "warn",
+      "single"
+    ],
+    "quote-props": [
+      "error",
+      "consistent"
+    ],
+    "semi": [
+      "warn",
+      "never"
+    ],
+    "space-before-function-paren": [
+      "error",
+      {
+        "anonymous": "never",
+        "named": "always",
+        "asyncArrow": "always"
+      }
+    ]
+  }
+}
