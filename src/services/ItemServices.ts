@@ -10,7 +10,7 @@ class ItemServices {
       return {
         id: item.id,
         title: item.title,
-        url_image: `http://localhost:3333/static/${item.image}`
+        url_image: `http://192.168.1.136:3333/static/${item.image}`
       }
     })
     return resp.json(serializedItems)

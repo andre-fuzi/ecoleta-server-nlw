@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-import { Request, Response, response } from 'express'
+import { Request, Response, response, request } from 'express'
 import knex from '../database/connection'
 
 class CollectPointServices {
@@ -18,7 +18,7 @@ class CollectPointServices {
     // Open a transactio, which is a condicional insert. If one of the called inserts fail, no DB will be updated. (None data will be inserted in any call)
     const trx = await knex.transaction()
     const collectPoint = {
-      image: 'https://images.unsplash.com/photo-1556767576-5ec41e3239ea?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60',
+      image: req.file.filename,
       name,
       email,
       whatsapp,
@@ -31,12 +31,14 @@ class CollectPointServices {
     const insertedId = await trx('collectpoints').insert(collectPoint)
     const collectPointId = insertedId[0]
 
-    const collectPointItems = items.map((itemId: number) => {
-      return {
-        'collectpoints_id': collectPointId,
-        'items_id': itemId
-      }
-    })
+    const collectPointItems = items.split(',')
+      .map((item:string) => Number(item.trim()))
+      .map((itemId: number) => {
+        return {
+          'collectpoints_id': collectPointId,
+          'items_id': itemId
+        }
+      })
 
     await trx('collectpoints_items').insert(collectPointItems)
 
@@ -63,7 +65,14 @@ class CollectPointServices {
       .distinct()
       .select('collectpoints.*')
 
-    return resp.json(collectPoints)
+    const serializedPoints = collectPoints.map((point) => {
+      return {
+        ...point,
+        image_url: `http://192.168.1.136:3333/static/${point.image}`
+      }
+    })
+
+    return resp.json(serializedPoints)
   }
 
   async getById (req: Request, resp: Response) {
@@ -83,7 +92,12 @@ class CollectPointServices {
     const items = await knex('items').join('collectpoints_items', 'items.id', '=', 'collectpoints_items.items_id')
       .where('collectpoints_items.collectpoints_id', id).select('items.title')
 
-    return resp.json({ collectPoint, items })
+    const serializedPoint = {
+      ...collectPoint,
+      image_url: `http://192.168.1.136:3333/static/${collectPoint.image}`
+    }
+
+    return resp.json({ collectPoint: serializedPoint, items })
   }
 }
 
